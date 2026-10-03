@@ -9,6 +9,7 @@ This file is the project baseline: what we decided, why, how it's wired, and how
 1. A costume that works on Halloween night.
 2. A learning project. Code should be readable by an 11-year-old who knows Python. Prefer simple and explicit over clever.
 3. Low cost. Reuse parts we own.
+4. Have fun!
 
 ---
 
