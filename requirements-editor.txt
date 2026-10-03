@@ -1,0 +1,6 @@
+# Copies of the Pico libraries so the editor can autocomplete them.
+# They never run on the computer. Install WITHOUT their dependencies:
+#   pip install --no-deps -r requirements-editor.txt
+adafruit-circuitpython-motor
+adafruit-circuitpython-neopixel
+adafruit-circuitpython-pixelbuf

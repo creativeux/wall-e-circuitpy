@@ -219,13 +219,28 @@ Run these once, in a terminal, inside the repo folder:
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-dev.txt
+pip install --no-deps -r requirements-editor.txt
+circuitpython_setboard raspberry_pi_pico
 ```
 
-This makes a private Python in `.venv/` with `circup` (installs libraries onto the Pico) and `circuitpython-stubs` (lets the editor autocomplete `board`, `digitalio`, and friends). Point the editor's Python interpreter at `.venv`.
+This makes a private Python in `.venv/` with:
+
+- `circup`, which installs libraries onto the Pico.
+- `circuitpython-stubs`, which lets the editor autocomplete `board`, `digitalio`, and friends. The `circuitpython_setboard` line tells it which board we have, so it knows `board.GP0`.
+- Copies of the Pico libraries (`adafruit_motor`, `neopixel`) for the editor only. They never run on the computer. Keep the `--no-deps`.
+
+Point the editor's Python interpreter at `.venv`. In VS Code: Ctrl+Shift+P, **Python: Select Interpreter**, pick `.venv`. `pyrightconfig.json` turns off a VS Code warning that would otherwise underline every CircuitPython import.
 
 Each time you open a new terminal, run `source .venv/bin/activate` again.
 
-Chromebook only, before the steps above: `sudo apt install git python3-venv`.
+Chromebook only, before the steps above:
+
+```
+sudo apt update
+sudo apt install git python3-venv
+```
+
+If `python3 -m venv .venv` still fails, its error message names the exact package to install. On the Pixelbook it was `sudo apt install python3.11-venv`.
 
 ### Deploy commands (same on both machines)
 
