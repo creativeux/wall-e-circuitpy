@@ -1,0 +1,4 @@
+# Tools for the computer (not the Pico). Install into the .venv:
+#   pip install -r requirements-dev.txt
+circup
+circuitpython-stubs
