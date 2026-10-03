@@ -247,7 +247,7 @@ If `python3 -m venv .venv` still fails, its error message names the exact packag
 | Command | What it does |
 |---|---|
 | `python tools/deploy.py` | Copies `src/` to the Pico. Only changed files are written. Never touches `lib/`. |
-| `python tools/deploy.py experiments/one_servo.py` | Runs one experiment by copying it to the Pico as `code.py`. |
+| `python tools/deploy.py experiments/one_servo.py` | Runs one experiment by copying it to the Pico as `code.py`. The other files in `src/` (`pins.py`, `settings.py`) are copied too, so the experiment can import them. |
 | `python tools/deploy.py --libs` | Installs the libraries in `requirements-circuitpython.txt` onto the Pico. |
 
 The script finds the `CIRCUITPY` drive by itself. If it can't, tell it where: `python tools/deploy.py --path /where/it/is`.

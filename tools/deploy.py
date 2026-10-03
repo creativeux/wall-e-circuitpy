@@ -3,6 +3,7 @@
 
     python tools/deploy.py                            copy src/ to the board
     python tools/deploy.py experiments/one_servo.py   run one experiment as code.py
+                                                      (pins.py and settings.py go along too)
     python tools/deploy.py --libs                     install the libraries with circup
     python tools/deploy.py --path /some/where         use this drive instead of searching
 """
@@ -65,34 +66,36 @@ def copy_if_changed(source, target):
     return True
 
 
-def deploy_src(board):
+def deploy(board, code_file):
+    """Copy src/ to the board, with code_file as the board's code.py.
+
+    code_file is normally src/code.py. For an experiment it is the
+    experiment file, so the experiment can still import pins and settings.
+    """
     changed = []
 
-    # code.py goes last so the Pico restarts with every other file in place.
-    sources = sorted(SRC.glob("*.py"), key=lambda f: f.name == "code.py")
-    for source in sources:
+    helpers = sorted(f for f in SRC.glob("*.py") if f.name != "code.py")
+    for source in helpers:
         if copy_if_changed(source, board / source.name):
             changed.append("copied  " + source.name)
 
+    # code.py goes last so the Pico restarts with every other file in place.
+    if copy_if_changed(code_file, board / "code.py"):
+        if code_file.name == "code.py":
+            changed.append("copied  code.py")
+        else:
+            changed.append("copied  " + code_file.name + " -> code.py")
+
     # Remove .py files on the board that are no longer in src/.
-    names_in_src = {source.name for source in sources}
+    names_to_keep = {source.name for source in helpers} | {"code.py"} | KEEP_ON_BOARD
     for on_board in board.glob("*.py"):
         if on_board.name.startswith("._"):
             continue  # Mac junk, cleaned up in main()
-        if on_board.name not in names_in_src and on_board.name not in KEEP_ON_BOARD:
+        if on_board.name not in names_to_keep:
             on_board.unlink()
             changed.append("removed " + on_board.name)
 
     return changed
-
-
-def deploy_experiment(board, experiment):
-    if not experiment.is_file():
-        print("No such file:", experiment)
-        sys.exit(1)
-    if copy_if_changed(experiment, board / "code.py"):
-        return ["copied  " + experiment.name + " -> code.py"]
-    return []
 
 
 def install_libs(board):
@@ -121,9 +124,13 @@ def main():
         install_libs(board)
         changed = []
     elif args.experiment:
-        changed = deploy_experiment(board, Path(args.experiment))
+        experiment = Path(args.experiment)
+        if not experiment.is_file():
+            print("No such file:", experiment)
+            sys.exit(1)
+        changed = deploy(board, experiment)
     else:
-        changed = deploy_src(board)
+        changed = deploy(board, SRC / "code.py")
 
     # The Mac leaves a hidden "._name" file next to each file it writes
     # to the board. They are junk, so remove them.
