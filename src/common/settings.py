@@ -5,6 +5,10 @@
 # before a servo is mounted, then write them here. A servo pushed past its
 # mechanical stop strips its gears.
 
+# Timing
+LOOP_SECONDS = 0.02  # how long each feature waits between checks
+HEARTBEAT_SECONDS = 0.5  # on-board LED blink
+
 # Head halves (MG996R)
 HEAD_LEFT_MIN = 80
 HEAD_LEFT_MAX = 100
