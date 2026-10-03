@@ -249,7 +249,7 @@ If `python3 -m venv .venv` still fails, its error message names the exact packag
 
 | Command | What it does |
 |---|---|
-| `python tools/deploy.py` | Copies `src/` (including `systems/`) to the Pico. Only changed files are written. Never touches `lib/`. |
+| `python tools/deploy.py` | Copies `src/` (including `common/` and `systems/`) to the Pico. Only changed files are written. Old `.py` files are removed from the top of the drive and from the folders `src/` has. Never touches `lib/` or any other folder. |
 | `python tools/deploy.py experiments/one_servo.py` | Runs one experiment by copying it to the Pico as `code.py`. The folders in `src/` (`common/`, `systems/`) are copied too, so the experiment can import them. |
 | `python tools/deploy.py --libs` | Installs the libraries in `requirements-circuitpython.txt` onto the Pico. |
 

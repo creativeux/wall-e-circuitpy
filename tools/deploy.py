@@ -22,10 +22,7 @@ SRC = REPO / "src"
 LIBS_FILE = REPO / "requirements-circuitpython.txt"
 
 # Files on the board that deploy never deletes.
-KEEP_ON_BOARD = {"boot.py"}
-
-# Folders on the board that deploy never looks inside.
-KEEP_FOLDERS = {"lib", "sd"}
+KEEP_ON_BOARD = {"boot.py", "safemode.py"}
 
 
 def possible_board_paths():
@@ -71,18 +68,17 @@ def copy_if_changed(source, target):
 
 
 def our_folders(board):
-    """The top of the drive and every folder on it that deploy looks after.
+    """The places on the board that deploy looks after.
 
-    That is everything except lib/, sd/ and hidden folders. Folders inside
-    other folders come first, so an emptied folder can be removed before
-    the folder that holds it.
+    That is the top of the drive and the folders that src/ has (like
+    systems/). Every other folder on the board is left alone.
     """
     folders = [board]
-    for top in board.iterdir():
-        if top.is_dir() and top.name not in KEEP_FOLDERS and not top.name.startswith("."):
-            folders.append(top)
-            folders.extend(f for f in top.rglob("*") if f.is_dir())
-    return sorted(folders, reverse=True)
+    for folder in sorted(f for f in SRC.rglob("*") if f.is_dir() and f.name != "__pycache__"):
+        on_board = board / folder.relative_to(SRC)
+        if on_board.is_dir():
+            folders.append(on_board)
+    return folders
 
 
 def deploy(board, code_file):
@@ -107,25 +103,20 @@ def deploy(board, code_file):
         else:
             changed.append("copied  " + code_file.name + " -> code.py")
 
-    # Remove .py files on the board that are no longer in src/, and any
-    # folder that leaves empty (for example after a folder is renamed).
-    names_to_keep = {str(name) for name in helpers} | {"code.py"} | KEEP_ON_BOARD
+    # Remove .py files on the board that are no longer in src/.
+    # The board's drive treats Head.py and head.py as the same file, so
+    # names are compared in lower case.
+    names_to_keep = {str(name).lower() for name in helpers} | {"code.py"} | KEEP_ON_BOARD
     for folder in our_folders(board):
-        for on_board in folder.glob("*.py"):
+        for on_board in sorted(folder.iterdir()):
             if on_board.name.startswith("._"):
-                continue  # Mac junk, removed below or in main()
+                continue  # Mac junk, cleaned up in main()
+            if not on_board.is_file() or on_board.suffix.lower() != ".py":
+                continue
             name = str(on_board.relative_to(board))
-            if name not in names_to_keep:
+            if name.lower() not in names_to_keep:
                 on_board.unlink()
-                junk = on_board.with_name("._" + on_board.name)
-                if junk.is_file():
-                    junk.unlink()
                 changed.append("removed " + name)
-
-        name = folder.relative_to(board)
-        if folder != board and not (SRC / name).is_dir() and not any(folder.iterdir()):
-            folder.rmdir()
-            changed.append("removed " + str(name) + "/")
 
     return changed
 
