@@ -265,6 +265,15 @@ The script finds the `CIRCUITPY` drive by itself. If it can't, tell it where: `p
 - Serial console / REPL: the simplest route on a Chromebook is **code.circuitpython.org** in Chrome, which connects over USB from the browser. It also works as a quick editor for experiments.
 - Verify these paths on first setup and correct this section if ChromeOS differs.
 
+Chromebook troubleshooting:
+
+- **`CIRCUITPY` is not in the Files app.** The Pico was probably handed to Linux as a USB device. Go to Settings > Linux development environment > Manage USB devices and turn the Pico off. Replug it, and do not click the "Connect to Linux" notification.
+- **"Read-only file system" when deploying.** Try making a folder on `CIRCUITPY` in the Files app. If that fails too, the drive was unplugged without ejecting: plug it into the Mac, let it mount, eject it, and bring it back. If the Files app can write but Linux can't, remove `CIRCUITPY` under Manage shared folders and share it again.
+
+### Moving the Pico between computers
+
+**Eject `CIRCUITPY` before unplugging**, on both machines. Pulling it out without ejecting can leave the drive read-only on the next computer.
+
 ### Workflow
 
 1. `git pull`
