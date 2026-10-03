@@ -3,7 +3,7 @@
 
     python tools/deploy.py                            copy src/ to the board
     python tools/deploy.py experiments/one_servo.py   run one experiment as code.py
-                                                      (pins.py and settings.py go along too)
+                                                      (the rest of src/ goes along too)
     python tools/deploy.py --libs                     install the libraries with circup
     python tools/deploy.py --path /some/where         use this drive instead of searching
 """
@@ -22,7 +22,7 @@ SRC = REPO / "src"
 LIBS_FILE = REPO / "requirements-circuitpython.txt"
 
 # Files on the board that deploy never deletes.
-KEEP_ON_BOARD = {"boot.py"}
+KEEP_ON_BOARD = {"boot.py", "safemode.py"}
 
 
 def possible_board_paths():
@@ -61,9 +61,24 @@ def copy_if_changed(source, target):
     """Copy one file, but only if it is different. Returns True if copied."""
     if target.exists() and filecmp.cmp(source, target, shallow=False):
         return False
+    target.parent.mkdir(parents=True, exist_ok=True)
     # copyfile copies only the contents, which is all the board's drive needs.
     shutil.copyfile(source, target)
     return True
+
+
+def our_folders(board):
+    """The places on the board that deploy looks after.
+
+    That is the top of the drive and the folders that src/ has (like
+    systems/). Every other folder on the board is left alone.
+    """
+    folders = [board]
+    for folder in sorted(f for f in SRC.rglob("*") if f.is_dir() and f.name != "__pycache__"):
+        on_board = board / folder.relative_to(SRC)
+        if on_board.is_dir():
+            folders.append(on_board)
+    return folders
 
 
 def deploy(board, code_file):
@@ -74,10 +89,12 @@ def deploy(board, code_file):
     """
     changed = []
 
-    helpers = sorted(f for f in SRC.glob("*.py") if f.name != "code.py")
-    for source in helpers:
-        if copy_if_changed(source, board / source.name):
-            changed.append("copied  " + source.name)
+    # Every .py file in src/ and its folders, as paths relative to src/.
+    helpers = sorted(f.relative_to(SRC) for f in SRC.rglob("*.py"))
+    helpers.remove(Path("code.py"))
+    for name in helpers:
+        if copy_if_changed(SRC / name, board / name):
+            changed.append("copied  " + str(name))
 
     # code.py goes last so the Pico restarts with every other file in place.
     if copy_if_changed(code_file, board / "code.py"):
@@ -87,13 +104,19 @@ def deploy(board, code_file):
             changed.append("copied  " + code_file.name + " -> code.py")
 
     # Remove .py files on the board that are no longer in src/.
-    names_to_keep = {source.name for source in helpers} | {"code.py"} | KEEP_ON_BOARD
-    for on_board in board.glob("*.py"):
-        if on_board.name.startswith("._"):
-            continue  # Mac junk, cleaned up in main()
-        if on_board.name not in names_to_keep:
-            on_board.unlink()
-            changed.append("removed " + on_board.name)
+    # The board's drive treats Head.py and head.py as the same file, so
+    # names are compared in lower case.
+    names_to_keep = {str(name).lower() for name in helpers} | {"code.py"} | KEEP_ON_BOARD
+    for folder in our_folders(board):
+        for on_board in sorted(folder.iterdir()):
+            if on_board.name.startswith("._"):
+                continue  # Mac junk, cleaned up in main()
+            if not on_board.is_file() or on_board.suffix.lower() != ".py":
+                continue
+            name = str(on_board.relative_to(board))
+            if name.lower() not in names_to_keep:
+                on_board.unlink()
+                changed.append("removed " + name)
 
     return changed
 
@@ -134,9 +157,10 @@ def main():
 
     # The Mac leaves a hidden "._name" file next to each file it writes
     # to the board. They are junk, so remove them.
-    for junk in board.glob("._*"):
-        if junk.is_file():
-            junk.unlink()
+    for folder in our_folders(board):
+        for junk in folder.glob("._*"):
+            if junk.is_file():
+                junk.unlink()
 
     # Make sure everything is really written before the Pico is unplugged.
     os.sync()

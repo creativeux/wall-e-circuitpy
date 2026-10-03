@@ -83,7 +83,7 @@ Full parts list with links and prices: `docs/wall-e-parts-list.xlsx`.
 
 ## 4. Pin map
 
-`src/pins.py` is the single source of truth. If the wiring changes, change that file and this table together.
+`src/common/pins.py` is the single source of truth. If the wiring changes, change that file and this table together.
 
 | Pin | Connected to | Type |
 |---|---|---|
@@ -146,13 +146,16 @@ wall-e-circuitpy/
 │   └── wall-e-parts-list.xlsx parts list + servo plan
 ├── src/                   everything in here gets copied to the Pico
 │   ├── code.py            entry point: sets up hardware, starts the tasks
-│   ├── pins.py            every pin assignment, nothing else
-│   ├── settings.py        servo angles, speeds, colors, timings
-│   ├── eyebrows.py        (not written yet)
-│   ├── wipers.py          (not written yet)
-│   ├── head.py            (not written yet)
-│   ├── belly.py           (not written yet)
-│   └── charge_meter.py    (not written yet)
+│   ├── common/            shared by code.py and every system
+│   │   ├── pins.py            every pin assignment, nothing else
+│   │   ├── settings.py        servo angles, speeds, colors, timings
+│   │   └── utils.py           make_servo, make_switch, make_pot, make_pixel
+│   └── systems/           one file per feature
+│       ├── eyebrows.py        (stub: starts up, does nothing yet)
+│       ├── wipers.py          (stub)
+│       ├── head.py            (stub)
+│       ├── belly.py           (stub)
+│       └── charge_meter.py    (stub)
 ├── experiments/           small one-file bench tests (one servo, one button, LED strip)
 └── tools/
     └── deploy.py          copies src/ to the CIRCUITPY drive (Mac and Chromebook)
@@ -164,8 +167,8 @@ Rules:
 
 - **The Git repo is the source of truth, not the Pico.** Edit in the repo, copy to the board. Never treat the `CIRCUITPY` drive as the only copy.
 - **Do not commit `lib/`.** Libraries come from the bundle. List them in this README.
-- **No magic numbers in feature files.** Pins live in `pins.py`. Angles and timings live in `settings.py`.
-- **One feature per file**, each exposing one `async def run(...)` task.
+- **No magic numbers in feature files.** Pins live in `common/pins.py`. Angles and timings live in `common/settings.py`.
+- **One feature per file** in `src/systems/`, each exposing one `async def run(...)` task.
 
 ### Code conventions
 
@@ -246,8 +249,8 @@ If `python3 -m venv .venv` still fails, its error message names the exact packag
 
 | Command | What it does |
 |---|---|
-| `python tools/deploy.py` | Copies `src/` to the Pico. Only changed files are written. Never touches `lib/`. |
-| `python tools/deploy.py experiments/one_servo.py` | Runs one experiment by copying it to the Pico as `code.py`. The other files in `src/` (`pins.py`, `settings.py`) are copied too, so the experiment can import them. |
+| `python tools/deploy.py` | Copies `src/` (including `common/` and `systems/`) to the Pico. Only changed files are written. Old `.py` files are removed from the top of the drive and from the folders `src/` has. Never touches `lib/` or any other folder. |
+| `python tools/deploy.py experiments/one_servo.py` | Runs one experiment by copying it to the Pico as `code.py`. The folders in `src/` (`common/`, `systems/`) are copied too, so the experiment can import them. |
 | `python tools/deploy.py --libs` | Installs the libraries in `requirements-circuitpython.txt` onto the Pico. |
 
 The script finds the `CIRCUITPY` drive by itself. If it can't, tell it where: `python tools/deploy.py --path /where/it/is`.
