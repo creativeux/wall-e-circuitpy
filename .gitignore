@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+._*
+
+# Editors
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# CircuitPython libraries come from the bundle (see requirements-circuitpython.txt)
+lib/

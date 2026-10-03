@@ -132,13 +132,15 @@ These were planned from Waveshare's documentation, which did not spell everythin
   - `asyncio` (pulls in `adafruit_ticks`) — one loop per feature
 - Built in, no install needed: `board`, `digitalio`, `analogio`, `pwmio`, `time`.
 
-Install libraries with `circup` from a computer with Python: `pip install circup`, then `circup install adafruit_motor neopixel asyncio`. Or copy the folders by hand from the bundle zip.
+The list lives in `requirements-circuitpython.txt`. Install them onto the Pico with `python tools/deploy.py --libs` (it runs `circup` for you; see [Development setup](#6-development-setup)). Or copy the folders by hand from the bundle zip.
 
 ### Proposed repository layout
 
 ```
 wall-e-circuitpy/
 ├── README.md              this file
+├── requirements-dev.txt            tools for the computer (circup, editor autocomplete)
+├── requirements-circuitpython.txt  libraries for the Pico
 ├── docs/
 │   ├── wall-e-wiring.html     wiring sheet (diagram, pin map, power-up checklist)
 │   └── wall-e-parts-list.xlsx parts list + servo plan
@@ -146,15 +148,17 @@ wall-e-circuitpy/
 │   ├── code.py            entry point: sets up hardware, starts the tasks
 │   ├── pins.py            every pin assignment, nothing else
 │   ├── settings.py        servo angles, speeds, colors, timings
-│   ├── eyebrows.py
-│   ├── wipers.py
-│   ├── head.py
-│   ├── belly.py
-│   └── charge_meter.py
+│   ├── eyebrows.py        (not written yet)
+│   ├── wipers.py          (not written yet)
+│   ├── head.py            (not written yet)
+│   ├── belly.py           (not written yet)
+│   └── charge_meter.py    (not written yet)
 ├── experiments/           small one-file bench tests (one servo, one button, LED strip)
 └── tools/
-    └── deploy.sh          copies src/ to the CIRCUITPY drive
+    └── deploy.py          copies src/ to the CIRCUITPY drive (Mac and Chromebook)
 ```
+
+The repo is `wall-e-circuitpy` on GitHub. The folder on your computer can have any name.
 
 Rules:
 
@@ -207,18 +211,42 @@ px.show()
 
 Both machines edit the same Git repo. The Pico is shared hardware: plug it into whichever computer is deploying.
 
+### First-time setup (same on both machines)
+
+Run these once, in a terminal, inside the repo folder:
+
+```
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-dev.txt
+```
+
+This makes a private Python in `.venv/` with `circup` (installs libraries onto the Pico) and `circuitpython-stubs` (lets the editor autocomplete `board`, `digitalio`, and friends). Point the editor's Python interpreter at `.venv`.
+
+Each time you open a new terminal, run `source .venv/bin/activate` again.
+
+Chromebook only, before the steps above: `sudo apt install git python3-venv`.
+
+### Deploy commands (same on both machines)
+
+| Command | What it does |
+|---|---|
+| `python tools/deploy.py` | Copies `src/` to the Pico. Only changed files are written. Never touches `lib/`. |
+| `python tools/deploy.py experiments/one_servo.py` | Runs one experiment by copying it to the Pico as `code.py`. |
+| `python tools/deploy.py --libs` | Installs the libraries in `requirements-circuitpython.txt` onto the Pico. |
+
+The script finds the `CIRCUITPY` drive by itself. If it can't, tell it where: `python tools/deploy.py --path /where/it/is`.
+
 ### Mac (IntelliJ)
 
 - Install the Python plugin. Open the repo folder.
 - The Pico mounts at `/Volumes/CIRCUITPY`.
 - Serial console / REPL: `screen /dev/tty.usbmodem* 115200` (Ctrl-A then K to quit), or use the browser editor below.
-- Deploy: `rsync -av --delete --exclude lib src/ /Volumes/CIRCUITPY/`
 
 ### Chromebook (VS Code in the Linux environment)
 
 - VS Code runs inside ChromeOS's Linux container. The repo lives in the Linux files.
 - When the Pico is plugged in, `CIRCUITPY` appears in the ChromeOS Files app. Right-click it and choose **Share with Linux**. It then appears under `/mnt/chromeos/removable/CIRCUITPY`.
-- Deploy: `rsync -av --delete --exclude lib src/ /mnt/chromeos/removable/CIRCUITPY/`
 - Serial console / REPL: the simplest route on a Chromebook is **code.circuitpython.org** in Chrome, which connects over USB from the browser. It also works as a quick editor for experiments.
 - Verify these paths on first setup and correct this section if ChromeOS differs.
 
@@ -229,8 +257,6 @@ Both machines edit the same Git repo. The Pico is shared hardware: plug it into 
 3. Deploy to the Pico. It restarts by itself when files change.
 4. Watch the serial console for errors.
 5. Commit when it works. `git push`.
-
-Add a `.gitignore` with: `.DS_Store`, `._*`, `.idea/`, `.vscode/`, `__pycache__/`, `lib/`.
 
 ---
 
