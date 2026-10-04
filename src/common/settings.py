@@ -10,11 +10,20 @@ LOOP_SECONDS = 0.02  # how long each feature waits between checks
 HEARTBEAT_SECONDS = 0.5  # on-board LED blink
 
 # Head halves (MG996R)
-HEAD_LEFT_MIN = 80
-HEAD_LEFT_MAX = 100
-HEAD_RIGHT_MIN = 80
-HEAD_RIGHT_MAX = 100
+HEAD_LEFT_MIN = 0
+HEAD_LEFT_MAX = 180
+HEAD_RIGHT_MIN = 0
+HEAD_RIGHT_MAX = 180
 HEAD_EASING = 0.15  # fraction of the way to the target moved each loop
+HEAD_POT_WOBBLE = 0.02  # ignore knob changes smaller than this (0.02 = 2%)
+
+# Where each head half sits with the knob turned all the way down (LOW)
+# and all the way up (HIGH). The right half mirrors the left one, so it
+# turns the other way. If a half moves the wrong way, swap its LOW and HIGH.
+HEAD_LEFT_LOW = HEAD_LEFT_MIN
+HEAD_LEFT_HIGH = HEAD_LEFT_MAX
+HEAD_RIGHT_LOW = HEAD_RIGHT_MAX
+HEAD_RIGHT_HIGH = HEAD_RIGHT_MIN
 
 # Eyebrows (MG90S)
 EYEBROW_LEFT_MIN = 0
