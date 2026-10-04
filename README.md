@@ -152,8 +152,8 @@ wall-e-circuitpy/
 │   │   └── utils.py           make_servo, make_switch, make_pot, make_pixel
 │   └── systems/           one file per feature
 │       ├── eyebrows.py        button held = up, released = down
-│       ├── wipers.py          (stub: starts up, does nothing yet)
-│       ├── head.py            (stub)
+│       ├── wipers.py          toggle on = sweep, off = park
+│       ├── head.py            (stub: starts up, does nothing yet)
 │       ├── belly.py           (stub)
 │       └── charge_meter.py    (stub)
 ├── experiments/           small one-file bench tests (one servo, one button, LED strip)
