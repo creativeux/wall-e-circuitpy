@@ -151,8 +151,8 @@ wall-e-circuitpy/
 │   │   ├── settings.py        servo angles, speeds, colors, timings
 │   │   └── utils.py           make_servo, make_switch, make_pot, make_pixel
 │   └── systems/           one file per feature
-│       ├── eyebrows.py        (stub: starts up, does nothing yet)
-│       ├── wipers.py          (stub)
+│       ├── eyebrows.py        button held = up, released = down
+│       ├── wipers.py          (stub: starts up, does nothing yet)
 │       ├── head.py            (stub)
 │       ├── belly.py           (stub)
 │       └── charge_meter.py    (stub)
