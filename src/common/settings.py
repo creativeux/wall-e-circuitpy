@@ -20,7 +20,8 @@ HEAD_CLOSE_ENOUGH = 0.001  # this close to the target counts as arrived
 HEAD_STAGGER_SECONDS = 0.3  # at startup, wait this long between the two halves
 HEAD_POT_SAMPLES = 8  # knob readings averaged together each loop
 HEAD_POT_WOBBLE = 0.02  # ignore knob changes smaller than this (0.02 = 2%)
-HEAD_POT_END_ZONE = 0.02  # this close to an end of the knob counts as the end
+HEAD_POT_FOLLOW_SECONDS = 0.5  # after the knob moves, follow it exactly for this long
+HEAD_POT_END_ZONE = 0.005  # this close to an end of the knob counts as the end
 
 # Where each head half sits with the knob turned all the way down (LOW)
 # and all the way up (HIGH). The right half mirrors the left one, so it
