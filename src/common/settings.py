@@ -17,10 +17,11 @@ HEAD_RIGHT_MAX = 100
 HEAD_EASING = 0.15  # fraction of the way to the target moved each loop
 
 # Eyebrows (MG90S)
-EYEBROW_LEFT_MIN = 20
+EYEBROW_LEFT_MIN = 0
 EYEBROW_LEFT_MAX = 160
-EYEBROW_RIGHT_MIN = 20
+EYEBROW_RIGHT_MIN = 0
 EYEBROW_RIGHT_MAX = 160
+
 # Where each eyebrow sits when it is down and when it is up.
 # The right servo is mounted as a mirror image of the left one, so it turns
 # the other way. If an eyebrow moves the wrong way, swap its UP and DOWN.
