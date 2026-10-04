@@ -155,8 +155,8 @@ wall-e-circuitpy/
 │       ├── eyebrows.py        button held = up, released = down
 │       ├── wipers.py          toggle on = sweep, off = park
 │       ├── head.py            knob sets the angle, mirrored and eased
-│       ├── belly.py           (stub: starts up, does nothing yet)
-│       └── charge_meter.py    (stub)
+│       ├── belly.py           toggle on = open, off = closed
+│       └── charge_meter.py    (stub: starts up, does nothing yet)
 ├── experiments/           small one-file bench tests (one servo, one button, LED strip)
 └── tools/
     └── deploy.py          copies src/ to the CIRCUITPY drive (Mac and Chromebook)
