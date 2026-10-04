@@ -21,7 +21,7 @@ This file is the project baseline: what we decided, why, how it's wired, and how
 | Eye wipers (left + right) | Toggle switch | On = sweep back and forth. Off = park. |
 | Belly trash door | Toggle switch | On = open. Off = closed. |
 | Head halves ("binocular" effect) | 10 kΩ potentiometer | Knob position sets the angle. The right half mirrors the left half. Movement is eased so it glides. |
-| Charge meter + sun icon (chest) | Automatic (trigger TBD) | Amber bars fill from the bottom, then the sun lights. |
+| Charge meter + sun icon (chest) | Automatic, follows the belly door | Works like a battery running down. When the belly door closes, the yellow bars fill up from wherever they are to all 8, and the sun lights. At power-on they fill from empty. Then one bar drops every 3 seconds. With 3 bars or fewer the bars are orange. When one bar is left it blinks red, until the door opens and closes again. |
 
 **Not in this version:** sound/speaker, any LCD or OLED screen, wifi or phone control, battery voltage readout. See [Deferred ideas](#9-deferred-ideas).
 
@@ -40,7 +40,7 @@ This file is the project baseline: what we decided, why, how it's wired, and how
 | Momentary push button (7 mm, prewired, normally open) | 1 | Eyebrows |
 | SPST toggle switch (screw terminals) | 2 | Wipers, belly door |
 | 10 kΩ linear potentiometer (WH148 B10K) | 1 | Head position |
-| WS2812B / NeoPixel LED strip, cut to length | ~14 LEDs | Charge meter (10 bars) + sun icon (3–4 LEDs) |
+| WS2812B / NeoPixel LED strip, cut to length | 9 LEDs | Charge meter (8 bars) + sun icon (1 LED) |
 | 1000 µF electrolytic capacitor (16 V or higher) | 1 | Across the 5 V servo rail to prevent brownout resets |
 | 7.2 V 6-cell NiMH RC pack, T-plug (Deans) | 1 | Costume power |
 | Female T-plug pigtail | 1 | Battery to board VIN terminal |
@@ -108,7 +108,7 @@ Full parts list with links and prices: `docs/wall-e-parts-list.xlsx`.
 - **The pot gets 3.3 V, never 5 V.** The Pico's ADC pins are not 5 V tolerant.
 - **Pot wire colors are not what they look like.** On our pots the **black** wire is the middle pin (the signal) and goes to GP26. **Yellow** is an outer pin and goes to GND. **Red** is the other outer pin and goes to 3V3. If the knob works backwards, swap red and yellow. To check any pot with a meter: the two wires whose resistance stays at about 10 kΩ as the knob turns are the outer pins; the third wire is the middle one. `experiments/pot.py` prints the voltage on the analog pins.
 - **NeoPixel pin order is not servo pin order.** Servo header: signal / 5 V / GND. Strip pads: 5 V / DIN / GND. Wire each lead individually. Data goes into the DIN end.
-- **NeoPixel chain order:** pixels 0–9 are the bars (0 at the bottom), pixels 10–13 are the sun. The sun section is cut off and rejoined with three wires (DOUT → DIN) so it can sit separately.
+- **NeoPixel chain order:** pixels 0–7 are the bars (0 at the bottom), pixel 8 is the sun. The sun pixel is cut off and rejoined with three wires (DOUT → DIN) so it can sit separately.
 
 ### ⚠️ Not yet verified against the real board
 
@@ -155,8 +155,8 @@ wall-e-circuitpy/
 │       ├── eyebrows.py        button held = up, released = down
 │       ├── wipers.py          toggle on = sweep, off = park
 │       ├── head.py            knob sets the angle, mirrored and eased
-│       ├── belly.py           toggle on = open, off = closed
-│       └── charge_meter.py    (stub: starts up, does nothing yet)
+│       ├── belly.py           toggle on = open, off = closed; closing restarts the charge meter
+│       └── charge_meter.py    what the chest lights look like (used by belly.py)
 ├── experiments/           small one-file bench tests (one servo, one button, LED strip)
 └── tools/
     └── deploy.py          copies src/ to the CIRCUITPY drive (Mac and Chromebook)
@@ -169,7 +169,7 @@ Rules:
 - **The Git repo is the source of truth, not the Pico.** Edit in the repo, copy to the board. Never treat the `CIRCUITPY` drive as the only copy.
 - **Do not commit `lib/`.** Libraries come from the bundle. List them in this README.
 - **No magic numbers in feature files.** Pins live in `common/pins.py`. Angles and timings live in `common/settings.py`.
-- **One feature per file** in `src/systems/`, each exposing one `async def run(...)` task.
+- **One feature per file** in `src/systems/`, each exposing one `async def run(...)` task. The exception is `charge_meter.py`: the lights follow the belly door, so `belly.py` runs them and `charge_meter.py` only says what they should look like.
 
 ### Code conventions
 
@@ -204,8 +204,8 @@ current += (target - current) * 0.15
 
 # NeoPixel
 import neopixel
-px = neopixel.NeoPixel(board.GP7, 14, brightness=0.25, auto_write=False)
-px[0] = (255, 140, 0)   # amber
+px = neopixel.NeoPixel(board.GP7, 9, brightness=0.25, auto_write=False)
+px[0] = (255, 180, 0)   # yellow
 px.show()
 ```
 
@@ -300,7 +300,7 @@ Each step is a small win and ends with something moving or lighting up.
 6. **Head.** Pot → angle, mirrored, then add easing.
 7. **Wipers.** First with `time.sleep` to see the problem (everything else freezes), then fix it.
 8. **asyncio.** One task per feature in `code.py`.
-9. **Charge meter.** Bars fill, sun lights. Decide what triggers it (power-on? a spare switch?).
+9. **Charge meter.** Bars fill, sun lights. It follows the belly door.
 10. **Power.** Move from wall adapter to battery. Add the capacitor. Test all features at once.
 11. **Costume integration.** Mount servos, pushrods, controller box, cable runs.
 
@@ -315,7 +315,6 @@ Each step is a small win and ends with something moving or lighting up.
 
 ## 8. Open questions
 
-- What triggers the charge-meter animation?
 - Final input pin choice (see "Not yet verified", item 2).
 - Controller box design and cable route to the body.
 - Whether the belly door needs an MG996R once the real door is built.

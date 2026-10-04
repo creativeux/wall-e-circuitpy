@@ -4,7 +4,6 @@
 #
 # Each feature lives in its own file in systems/ with one
 # "async def run(...)".
-# Some are still stubs: they start up and do nothing.
 #
 # Needs the libraries: python tools/deploy.py --libs
 
@@ -15,7 +14,6 @@ import digitalio
 from common import pins
 from common import settings
 from systems import belly
-from systems import charge_meter
 from systems import eyebrows
 from systems import head
 from systems import wipers
@@ -62,8 +60,7 @@ async def main():
         eyebrows.run(eyebrow_button, eyebrow_left, eyebrow_right),
         wipers.run(wiper_toggle, wiper_left, wiper_right),
         head.run(head_pot, head_left, head_right),
-        belly.run(belly_toggle, belly_door),
-        charge_meter.run(pixels),
+        belly.run(belly_toggle, belly_door, pixels),
     )
 
 
