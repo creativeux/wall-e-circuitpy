@@ -1,14 +1,89 @@
-# Head halves: the knob sets the angle. The left half goes to angle,
-# the right half goes to 180 - angle. Movement is eased so it glides.
-#
-# STUB: starts up and does nothing yet (build step 6).
+# Head halves: the knob sets the angle. The two halves mirror each other,
+# and movement is eased so it glides.
 
 import asyncio
 
 from common import settings
 
 
+def read_knob(pot):
+    # The reading wobbles a little, so take a few and average them.
+    total = 0
+    for _ in range(settings.HEAD_POT_SAMPLES):
+        total += pot.value
+
+    # pot.value goes from 0 to 65535. Turn the average into 0.0 to 1.0.
+    reading = total / settings.HEAD_POT_SAMPLES / 65535
+
+    # A knob almost never reads exactly 0.0 or 1.0 at its ends. Stretch the
+    # reading a little so the last bit of travel counts as the end.
+    end_zone = settings.HEAD_POT_END_ZONE
+    reading = (reading - end_zone) / (1 - 2 * end_zone)
+    return max(0.0, min(1.0, reading))
+
+
+def move_left(left, position):
+    # position goes from 0.0 (knob all the way down) to 1.0 (all the way up).
+    left_range = settings.HEAD_LEFT_HIGH - settings.HEAD_LEFT_LOW
+    left.angle = settings.HEAD_LEFT_LOW + left_range * position
+
+
+def move_right(right, position):
+    right_range = settings.HEAD_RIGHT_HIGH - settings.HEAD_RIGHT_LOW
+    right.angle = settings.HEAD_RIGHT_LOW + right_range * position
+
+
 async def run(pot, left, right):
     print("head: ready")
+
+    # Start where the knob is. Move one half, wait, then move the other, so
+    # the two big servos don't both pull power at the same instant.
+    target = read_knob(pot)
+    position = target
+    print("head: knob", round(target * 100), "%")
+    move_left(left, position)
+    await asyncio.sleep(settings.HEAD_STAGGER_SECONDS)
+    move_right(right, position)
+
+    # How many loops to keep following the knob after it moves.
+    follow_loops = int(settings.HEAD_POT_FOLLOW_SECONDS / settings.LOOP_SECONDS)
+    loops_left = 0
+    last_big_move = target  # the knob reading the last time it really moved
+
     while True:
+        reading = read_knob(pot)
+        big_move = abs(reading - last_big_move) > settings.HEAD_POT_WOBBLE
+        reached_end = (reading == 0.0 or reading == 1.0) and reading != target
+
+        if reached_end:
+            # The knob is at one of its ends: go all the way there and stay.
+            target = reading
+            last_big_move = reading
+            loops_left = 0
+            print("head: knob", round(reading * 100), "%")
+        elif big_move:
+            # The reading wobbles a little even when nobody touches the knob,
+            # so small changes are ignored. A big change means the knob really
+            # moved: follow it exactly for a short while, so the head ends up
+            # right where the knob stops.
+            last_big_move = reading
+            loops_left = follow_loops
+            print("head: knob", round(reading * 100), "%")
+
+        if loops_left > 0:
+            target = reading
+            loops_left -= 1
+            if loops_left == 0:
+                print("head: knob stopped at", round(target * 100), "%")
+
+        # Ease: move a fraction of the way to the target each loop.
+        old_position = position
+        position += (target - position) * settings.HEAD_EASING
+        if abs(target - position) < settings.HEAD_CLOSE_ENOUGH:
+            position = target  # close enough, stop here
+
+        if position != old_position:
+            move_left(left, position)
+            move_right(right, position)
+
         await asyncio.sleep(settings.LOOP_SECONDS)

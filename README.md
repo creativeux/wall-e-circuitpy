@@ -20,7 +20,7 @@ This file is the project baseline: what we decided, why, how it's wired, and how
 | Eyebrows (left + right) | Momentary push button | Held = eyebrows up. Released = eyebrows down. |
 | Eye wipers (left + right) | Toggle switch | On = sweep back and forth. Off = park. |
 | Belly trash door | Toggle switch | On = open. Off = closed. |
-| Head halves ("binocular" effect) | 10 kΩ potentiometer | Knob position sets the angle. Left half goes to `angle`, right half goes to `180 - angle`. Movement is eased so it glides. |
+| Head halves ("binocular" effect) | 10 kΩ potentiometer | Knob position sets the angle. The right half mirrors the left half. Movement is eased so it glides. |
 | Charge meter + sun icon (chest) | Automatic (trigger TBD) | Amber bars fill from the bottom, then the sun lights. |
 
 **Not in this version:** sound/speaker, any LCD or OLED screen, wifi or phone control, battery voltage readout. See [Deferred ideas](#9-deferred-ideas).
@@ -106,6 +106,7 @@ Full parts list with links and prices: `docs/wall-e-parts-list.xlsx`.
 
 - **Switches and the button** connect a GPIO pin to GND. The code enables the internal pull-up, so **pressed/on reads `False`**.
 - **The pot gets 3.3 V, never 5 V.** The Pico's ADC pins are not 5 V tolerant.
+- **Pot wire colors are not what they look like.** On our pots the **black** wire is the middle pin (the signal) and goes to GP26. **Yellow** is an outer pin and goes to GND. **Red** is the other outer pin and goes to 3V3. If the knob works backwards, swap red and yellow. To check any pot with a meter: the two wires whose resistance stays at about 10 kΩ as the knob turns are the outer pins; the third wire is the middle one. `experiments/pot.py` prints the voltage on the analog pins.
 - **NeoPixel pin order is not servo pin order.** Servo header: signal / 5 V / GND. Strip pads: 5 V / DIN / GND. Wire each lead individually. Data goes into the DIN end.
 - **NeoPixel chain order:** pixels 0–9 are the bars (0 at the bottom), pixels 10–13 are the sun. The sun section is cut off and rejoined with three wires (DOUT → DIN) so it can sit separately.
 
@@ -153,8 +154,8 @@ wall-e-circuitpy/
 │   └── systems/           one file per feature
 │       ├── eyebrows.py        button held = up, released = down
 │       ├── wipers.py          toggle on = sweep, off = park
-│       ├── head.py            (stub: starts up, does nothing yet)
-│       ├── belly.py           (stub)
+│       ├── head.py            knob sets the angle, mirrored and eased
+│       ├── belly.py           (stub: starts up, does nothing yet)
 │       └── charge_meter.py    (stub)
 ├── experiments/           small one-file bench tests (one servo, one button, LED strip)
 └── tools/
