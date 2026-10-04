@@ -1,10 +1,9 @@
 # Servo angles, speeds, colors and timings. No pins in this file.
 #
 # The servo MIN/MAX values below are BENCH values, set with nothing attached
-# to the servo horns. The belly door is still a placeholder (a small, safe
-# range around the middle). Before a servo is mounted in the costume, find
-# how far its part can really move and write those limits here. A servo
-# pushed past a mechanical stop strips its gears.
+# to the servo horns. Before a servo is mounted in the costume, find how far
+# its part can really move and write those limits here. A servo pushed past
+# a mechanical stop strips its gears.
 
 # Timing
 LOOP_SECONDS = 0.02  # how long each feature waits between checks
@@ -61,8 +60,16 @@ WIPER_RIGHT_FAR = WIPER_RIGHT_MAX
 WIPER_SWEEP_SECONDS = 0.5  # time to sweep one way. Bigger = slower
 
 # Belly door (MG90S)
-BELLY_DOOR_MIN = 80
-BELLY_DOOR_MAX = 100
+BELLY_DOOR_MIN = 0
+BELLY_DOOR_MAX = 180
+
+# Where the door sits when it is closed and when it is open.
+# If the door moves the wrong way, swap CLOSED and OPEN.
+BELLY_DOOR_CLOSED = BELLY_DOOR_MIN
+BELLY_DOOR_OPEN = BELLY_DOOR_MAX
+BELLY_DOOR_SECONDS = 1.5  # time to open or close. Bigger = slower
+BELLY_DOOR_EASE_IN = 0  # part of the time spent speeding up. 0.2 = 20%
+BELLY_DOOR_EASE_OUT = 0.75  # part of the time spent slowing down
 
 # NeoPixel strip: pixels 0-9 are the bars (0 at the bottom),
 # pixels 10-13 are the sun.
