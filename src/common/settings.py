@@ -31,10 +31,19 @@ EYEBROW_RIGHT_DOWN = EYEBROW_RIGHT_MAX
 EYEBROW_RIGHT_UP = EYEBROW_RIGHT_MIN
 
 # Wipers (MG90S)
-WIPER_LEFT_MIN = 80
-WIPER_LEFT_MAX = 100
-WIPER_RIGHT_MIN = 80
-WIPER_RIGHT_MAX = 100
+WIPER_LEFT_MIN = 20
+WIPER_LEFT_MAX = 160
+WIPER_RIGHT_MIN = 20
+WIPER_RIGHT_MAX = 160
+
+# Where each wiper parks, and the far end of its sweep.
+# The right servo is mounted as a mirror image of the left one, so it turns
+# the other way. If a wiper parks at the wrong end, swap its PARK and FAR.
+WIPER_LEFT_PARK = WIPER_LEFT_MIN
+WIPER_LEFT_FAR = WIPER_LEFT_MAX
+WIPER_RIGHT_PARK = WIPER_RIGHT_MAX
+WIPER_RIGHT_FAR = WIPER_RIGHT_MIN
+WIPER_SWEEP_SECONDS = 0.5  # time to sweep one way. Bigger = slower
 
 # Belly door (MG90S)
 BELLY_DOOR_MIN = 80
