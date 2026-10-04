@@ -2,6 +2,7 @@
 # Prints the voltage on all three of the Pico's analog pins, so we can see
 # which pin the knob is really connected to. Turn the knob slowly and watch
 # which column follows it. It should be GP26.
+# A pin with nothing connected shows small, random voltages. That is normal.
 #
 # Run it with: python tools/deploy.py experiments/pot.py
 

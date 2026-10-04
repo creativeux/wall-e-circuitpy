@@ -20,7 +20,7 @@ This file is the project baseline: what we decided, why, how it's wired, and how
 | Eyebrows (left + right) | Momentary push button | Held = eyebrows up. Released = eyebrows down. |
 | Eye wipers (left + right) | Toggle switch | On = sweep back and forth. Off = park. |
 | Belly trash door | Toggle switch | On = open. Off = closed. |
-| Head halves ("binocular" effect) | 10 kΩ potentiometer | Knob position sets the angle. Left half goes to `angle`, right half goes to `180 - angle`. Movement is eased so it glides. |
+| Head halves ("binocular" effect) | 10 kΩ potentiometer | Knob position sets the angle. The right half mirrors the left half. Movement is eased so it glides. |
 | Charge meter + sun icon (chest) | Automatic (trigger TBD) | Amber bars fill from the bottom, then the sun lights. |
 
 **Not in this version:** sound/speaker, any LCD or OLED screen, wifi or phone control, battery voltage readout. See [Deferred ideas](#9-deferred-ideas).

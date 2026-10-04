@@ -4,7 +4,7 @@
 #
 # Each feature lives in its own file in systems/ with one
 # "async def run(...)".
-# Right now they are stubs: they start up and do nothing.
+# Some are still stubs: they start up and do nothing.
 #
 # Needs the libraries: python tools/deploy.py --libs
 
