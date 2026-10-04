@@ -47,9 +47,12 @@ async def run(toggle, door, pixels):
     # How much of a full swing to do each time around the loop.
     step = settings.LOOP_SECONDS / settings.BELLY_DOOR_SECONDS
 
-    # The door always starts closed.
-    place = 0.0  # where the door is now: 0.0 closed, 1.0 open
+    # Start wherever the toggle says: open if it is on, closed if it is off.
+    # The toggle connects its pin to GND, so on reads False.
+    on = not toggle.value
+    place = 1.0 if on else 0.0  # where the door is now: 0.0 closed, 1.0 open
     move(door, place)
+    print("belly: open" if on else "belly: closed")
 
     # A move goes from start to goal. progress counts from 0.0 to 1.0.
     start = place
@@ -60,10 +63,9 @@ async def run(toggle, door, pixels):
     meter_loops = 0  # times around the loop since the meter started
     shown = None  # the picture on the lights right now
     charge = None  # the charge in words, the last time it was printed
-    was_opened = False  # has the door opened since the meter last filled up?
+    was_opened = on  # has the door opened since the meter last filled up?
 
     while True:
-        # The toggle connects its pin to GND, so on reads False.
         on = not toggle.value
 
         wanted = 1.0 if on else 0.0
@@ -79,6 +81,8 @@ async def run(toggle, door, pixels):
             # A move that covers only part of the swing takes less time.
             progress = min(progress + step / abs(goal - start), 1.0)
             place = start + (goal - start) * ease(progress)
+            if progress == 1.0:
+                place = goal  # the move is finished: land exactly on the goal
             move(door, place)
             if progress == 1.0 and goal == 1.0:
                 print("belly: open")

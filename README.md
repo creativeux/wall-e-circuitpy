@@ -21,7 +21,7 @@ This file is the project baseline: what we decided, why, how it's wired, and how
 | Eye wipers (left + right) | Toggle switch | On = sweep back and forth. Off = park. |
 | Belly trash door | Toggle switch | On = open. Off = closed. |
 | Head halves ("binocular" effect) | 10 kΩ potentiometer | Knob position sets the angle. The right half mirrors the left half. Movement is eased so it glides. |
-| Charge meter + sun icon (chest) | Automatic, follows the belly door | Works like a battery running down. When the belly door closes, the yellow bars fill up from wherever they are to all 8, and the sun lights. At power-on they fill from empty. Then one bar drops every 3 seconds. With 3 bars or fewer the bars are orange. When one bar is left it blinks red, until the door opens and closes again. |
+| Charge meter + sun icon (chest) | Automatic, follows the belly door | Works like a battery running down. When the belly door closes, the bars fill up from wherever they are to all 8, and the sun lights. At power-on they fill from empty. Then one bar drops every few seconds. The last few bars are orange, the rest yellow. When one bar is left it blinks red, until the door opens and closes again. The timings and the orange level are in `settings.py`. |
 
 **Not in this version:** sound/speaker, any LCD or OLED screen, wifi or phone control, battery voltage readout. See [Deferred ideas](#9-deferred-ideas).
 

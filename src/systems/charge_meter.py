@@ -43,8 +43,9 @@ def picture(loops):
     if bars > 1:
         return (False, bars, dropped == 0)
 
-    # Only one bar left: it blinks red.
-    red_on = loops % (2 * flash) < flash
+    # Only one bar left: it blinks red, starting with the light on.
+    red_at = sun_at + (settings.BAR_COUNT - 1) * drop
+    red_on = (loops - red_at) % (2 * flash) < flash
     return (red_on, 0, False)
 
 

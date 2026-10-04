@@ -72,10 +72,10 @@ BELLY_DOOR_EASE_IN = 0  # part of the time spent speeding up. 0.2 = 20%
 BELLY_DOOR_EASE_OUT = 0.75  # part of the time spent slowing down
 
 # NeoPixel strip: pixels 0-7 are the bars (0 at the bottom),
-# pixel 8 is the sun.
-PIXEL_COUNT = 9
+# pixel 8 is the sun, straight after the last bar.
 BAR_COUNT = 8
-SUN_PIXEL = 8
+SUN_PIXEL = BAR_COUNT
+PIXEL_COUNT = BAR_COUNT + 1
 PIXEL_BRIGHTNESS = 0.25  # keep between 0.2 and 0.3
 OFF = (0, 0, 0)
 RED = (255, 0, 0)
