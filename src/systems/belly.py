@@ -61,7 +61,7 @@ async def run(toggle, door, pixels):
 
     # The charge meter starts by filling up.
     meter_loops = 0  # times around the loop since the meter started
-    shown = None  # the picture on the lights right now
+    fades = charge_meter.new_fades()  # how far each light has faded
     charge = None  # the charge in words, the last time it was printed
     was_opened = on  # has the door opened since the meter last filled up?
 
@@ -96,11 +96,9 @@ async def run(toggle, door, pixels):
             was_opened = False
             meter_loops = charge_meter.refill(meter_loops)
 
-        # Lights. Only send a new picture when it changes.
+        # Lights. Each one fades toward the color the meter wants.
         picture = charge_meter.picture(meter_loops)
-        if picture != shown:
-            charge_meter.draw(pixels, picture)
-            shown = picture
+        charge_meter.fade(pixels, fades, charge_meter.colors(picture))
 
         # Print the charge when it changes.
         now = charge_meter.describe(meter_loops)
