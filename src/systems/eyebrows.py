@@ -5,13 +5,20 @@ import asyncio
 from common import settings
 
 
+def mirror(angle):
+    # The right servo is mounted as a mirror image of the left one, so it
+    # has to turn the other way. Flipping the angle here means the same
+    # number in settings.py gives the same eyebrow position on both sides.
+    return 180 - angle
+
+
 def move(left, right, up):
     if up:
-        left.angle = settings.EYEBROW_LEFT_UP
-        right.angle = settings.EYEBROW_RIGHT_UP
+        left.angle = settings.EYEBROW_LEFT_MAX
+        right.angle = mirror(settings.EYEBROW_RIGHT_MAX)
     else:
-        left.angle = settings.EYEBROW_LEFT_DOWN
-        right.angle = settings.EYEBROW_RIGHT_DOWN
+        left.angle = settings.EYEBROW_LEFT_MIN
+        right.angle = mirror(settings.EYEBROW_RIGHT_MIN)
 
 
 async def run(button, left, right):

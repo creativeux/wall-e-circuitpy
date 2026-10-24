@@ -31,18 +31,14 @@ HEAD_RIGHT_LOW = HEAD_RIGHT_MAX
 HEAD_RIGHT_HIGH = HEAD_RIGHT_MIN
 
 # Eyebrows (MG90S)
-EYEBROW_LEFT_MIN = 0
-EYEBROW_LEFT_MAX = 160
-EYEBROW_RIGHT_MIN = 0
-EYEBROW_RIGHT_MAX = 160
-
-# Where each eyebrow sits when it is down and when it is up.
-# The right servo is mounted as a mirror image of the left one, so it turns
-# the other way. If an eyebrow moves the wrong way, swap its UP and DOWN.
-EYEBROW_LEFT_DOWN = EYEBROW_LEFT_MIN
-EYEBROW_LEFT_UP = EYEBROW_LEFT_MAX
-EYEBROW_RIGHT_DOWN = EYEBROW_RIGHT_MAX
-EYEBROW_RIGHT_UP = EYEBROW_RIGHT_MIN
+# MIN is where the eyebrow sits when it is down, MAX when it is up.
+# The numbers mean the same thing for both eyebrows: a bigger number is a
+# higher eyebrow. The right servo is mounted as a mirror image of the left
+# one, and eyebrows.py flips its angle for you.
+EYEBROW_LEFT_MIN = 10
+EYEBROW_LEFT_MAX = 100
+EYEBROW_RIGHT_MIN = 10
+EYEBROW_RIGHT_MAX = 100
 
 # Wipers (MG90S)
 WIPER_LEFT_MIN = 20
