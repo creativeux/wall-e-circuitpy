@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wall-E Wiring Sheet · Board View</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<style>
+/* Layout: one wide top view of the servo board first, then pin table and bench notes in two columns. Workshop datasheet feel. */
+:root {
+  --bg: #f6f4ee;
+  --fg: #22231f;
+  --muted: #6b6a62;
+  --rule: #cfccc2;
+  --panel: #ece9e0;
+  --power: #c2410c;   /* battery / 5 V rail / the red V pins */
+  --sig: #d9a400;     /* the yellow S pins */
+  --gnd: #2b2b28;     /* the black G pins */
+  --sans: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg:#1b1c19; --fg:#e8e6df; --muted:#a09e94; --rule:#3a3b36; --panel:#262723; --power:#f0834a; --sig:#e6b93c; --gnd:#8d8b82; color-scheme: dark }
+}
+:root[data-theme="dark"] { --bg:#1b1c19; --fg:#e8e6df; --muted:#a09e94; --rule:#3a3b36; --panel:#262723; --power:#f0834a; --sig:#e6b93c; --gnd:#8d8b82; color-scheme: dark }
+
+body { background: var(--bg); color: var(--fg); font-family: var(--sans); padding-inline: 16px; padding-block: 28px 48px; line-height: 1.5; }
+main { max-width: 1040px; margin: 0 auto; display: grid; gap: 28px; }
+header h1 { font-size: 1.6rem; margin: 0 0 4px; text-wrap: balance; }
+header p { margin: 0; color: var(--muted); max-width: 65ch; }
+.eyebrow { font-family: var(--mono); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+figure { margin: 0; border: 1px solid var(--rule); background: var(--panel); border-radius: 6px; padding: 12px; }
+.scroll { overflow-x: auto; }
+svg { display: block; width: 100%; min-width: 760px; height: auto; font-family: var(--mono); font-size: 12px; }
+figcaption { font-size: .85rem; color: var(--muted); margin-top: 8px; max-width: 80ch; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+@media (max-width: 720px) { .cols { grid-template-columns: 1fr } }
+h2 { font-size: 1rem; margin: 0 0 10px; }
+table { border-collapse: collapse; width: 100%; font-size: .88rem; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-family: var(--mono); font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+td.pin { font-family: var(--mono); font-weight: 600; white-space: nowrap; }
+ol { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; font-size: .92rem; max-width: 60ch; }
+code { font-family: var(--mono); font-size: .85em; }
+a { color: inherit; }
+.pw { color: var(--power); font-weight: 600; }
+</style>
+
+</head>
+<body style="margin:0">
+<main>
+<header>
+  <div class="eyebrow">Halloween build · bench reference · as wired 4 Oct 2026</div>
+  <h1>Wall-E Wiring Sheet · Board View</h1>
+  <p>Where each wire physically plugs into the Waveshare servo board, seen from above with the Pico's USB socket at the top. The servos, the LED strip and the switches use the numbered servo channels. The pot uses the pin header along the right edge. For the same wiring drawn as a circuit, see <a href="wall-e-wiring.html">the schematic sheet</a>.</p>
+</header>
+
+<figure>
+<div class="scroll">
+<svg viewBox="0 0 1000 720" role="img" aria-label="Top view of the Waveshare Pico Servo Driver board showing where each wire plugs in. Servo channels 0 to 6 carry the seven servos, channel 7 the LED strip, channels 13 to 15 the two toggles and the button on their S and G pins. The pot connects to 3V3, GND and GP26 on the pin header along the right edge. The battery connects to the VIN screw terminal at the top left.">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+  </marker>
+</defs>
+<g stroke="currentColor" fill="none" stroke-width="1.5">
+  <!-- Board outline -->
+  <rect x="300" y="50" width="400" height="640" rx="10" stroke-width="2"/>
+  <!-- Pico, USB end at the top -->
+  <rect x="480" y="84" width="130" height="516" rx="4" fill="var(--bg)"/>
+  <rect x="525" y="66" width="40" height="24" rx="2" fill="var(--bg)"/>
+  <!-- VIN screw terminal -->
+  <rect x="292" y="54" width="30" height="28" fill="var(--bg)"/>
+  <circle cx="307" cy="61" r="4"/><circle cx="307" cy="75" r="4"/>
+  <!-- 5 V regulator area -->
+  <rect x="312" y="336" width="64" height="108" rx="3" stroke="var(--muted)"/>
+  <!-- Power switch, VIN_CFG jumper, RESET button -->
+  <rect x="336" y="636" width="64" height="20" rx="2"/><rect x="342" y="640" width="24" height="12" fill="currentColor"/>
+  <rect x="496" y="634" width="60" height="26" rx="2"/><rect x="502" y="649" width="48" height="8" fill="currentColor" stroke="none"/>
+  <circle cx="640" cy="646" r="8"/>
+  <!-- Laptop and battery -->
+  <rect x="780" y="44" width="205" height="40" rx="4"/>
+  <line x1="780" y1="72" x2="566" y2="72" stroke-dasharray="6 5"/>
+  <rect x="20" y="40" width="230" height="48" rx="4"/>
+  <line x1="250" y1="61" x2="292" y2="61" stroke="var(--power)" stroke-width="2.5"/>
+  <line x1="250" y1="75" x2="292" y2="75" stroke-width="2.5"/>
+  <!-- Servo channel headers: G V S, channels 0-15 from the top -->
+  <rect x="400" y="97" width="14" height="14" fill="var(--gnd)"/><rect x="418" y="97" width="14" height="14" fill="var(--power)"/><rect x="436" y="97" width="14" height="14" fill="var(--sig)"/>
+  <rect x="400" y="123" width="14" height="14" fill="var(--gnd)"/><rect x="418" y="123" width="14" height="14" fill="var(--power)"/><rect x="436" y="123" width="14" height="14" fill="var(--sig)"/>
+  <rect x="400" y="149" width="14" height="14" fill="var(--gnd)"/><rect x="418" y="149" width="14" height="14" fill="var(--power)"/><rect x="436" y="149" width="14" height="14" fill="var(--sig)"/>
+  <rect x="400" y="175" width="14" height="14" fill="var(--gnd)"/><rect x="418" y="175" width="14" height="14" fill="var(--power)"/><rect x="436" y="175" width="14" height="14" fill="var(--sig)"/>
+  <rect x="400" y="223" width="14" height="14" fill="var(--gnd)"/><rect x="418" y="223" width="14" height="14" fill="var(--power)"/><rect x="436" y="223" width="14" height="14" fill="var(--sig)"/>
+  <rect x="400" y="249" width="14" height="14" fill="var(--gnd)"/><rect x="418" y="249" width="14" height="14" fill="var(--power)"/><rect x="436" y="249" width="14" height="14" fill="var(--sig)"/>
+  <rect x="400" y="275" width="14" height="14" fill="var(--gnd)"/><rect x="418" y="275" width="14" height="14" fill="var(--power)"/><rect x="436" y="275" width="14" height="14" fill="var(--sig)"/>
+  <rect x="400" y="301" width="14" height="14" fill="var(--gnd)"/><rect x="418" y="301" width="14" height="14" fill="var(--power)"/><rect x="436" y="301" width="14" height="14" fill="var(--sig)"/>
+  <rect x="400" y="349" width="14" height="14" stroke="var(--muted)" stroke-width="1"/><rect x="418" y="349" width="14" height="14" stroke="var(--muted)" stroke-width="1"/><rect x="436" y="349" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <rect x="400" y="375" width="14" height="14" stroke="var(--muted)" stroke-width="1"/><rect x="418" y="375" width="14" height="14" stroke="var(--muted)" stroke-width="1"/><rect x="436" y="375" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <rect x="400" y="401" width="14" height="14" stroke="var(--muted)" stroke-width="1"/><rect x="418" y="401" width="14" height="14" stroke="var(--muted)" stroke-width="1"/><rect x="436" y="401" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <rect x="400" y="427" width="14" height="14" stroke="var(--muted)" stroke-width="1"/><rect x="418" y="427" width="14" height="14" stroke="var(--muted)" stroke-width="1"/><rect x="436" y="427" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <rect x="400" y="475" width="14" height="14" stroke="var(--muted)" stroke-width="1"/><rect x="418" y="475" width="14" height="14" stroke="var(--muted)" stroke-width="1"/><rect x="436" y="475" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <rect x="400" y="501" width="14" height="14" fill="var(--gnd)"/><rect x="418" y="501" width="14" height="14" stroke="var(--muted)" stroke-width="1"/><rect x="436" y="501" width="14" height="14" fill="var(--sig)"/>
+  <rect x="400" y="527" width="14" height="14" fill="var(--gnd)"/><rect x="418" y="527" width="14" height="14" stroke="var(--muted)" stroke-width="1"/><rect x="436" y="527" width="14" height="14" fill="var(--sig)"/>
+  <rect x="400" y="553" width="14" height="14" fill="var(--gnd)"/><rect x="418" y="553" width="14" height="14" stroke="var(--muted)" stroke-width="1"/><rect x="436" y="553" width="14" height="14" fill="var(--sig)"/>
+  <!-- Pin header along the right edge (the Pico pins the servo channels do not use) -->
+  <rect x="656" y="93" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <rect x="656" y="118" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <rect x="656" y="143" width="14" height="14" fill="var(--gnd)"/>
+  <rect x="656" y="168" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <rect x="656" y="193" width="14" height="14" fill="var(--power)"/>
+  <rect x="656" y="218" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <rect x="656" y="243" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <rect x="656" y="268" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <rect x="656" y="293" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <rect x="656" y="318" width="14" height="14" fill="var(--sig)"/>
+  <rect x="656" y="343" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <rect x="656" y="368" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <rect x="656" y="393" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <rect x="656" y="418" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <rect x="656" y="443" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <rect x="656" y="468" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <rect x="656" y="493" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <rect x="656" y="518" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <rect x="656" y="543" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <rect x="656" y="568" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+  <!-- Servo, strip and control leads -->
+  <rect x="20" y="93" width="230" height="22" rx="4"/>
+  <rect x="20" y="119" width="230" height="22" rx="4"/>
+  <rect x="20" y="145" width="230" height="22" rx="4"/>
+  <rect x="20" y="171" width="230" height="22" rx="4"/>
+  <rect x="20" y="219" width="230" height="22" rx="4"/>
+  <rect x="20" y="245" width="230" height="22" rx="4"/>
+  <rect x="20" y="271" width="230" height="22" rx="4"/>
+  <rect x="20" y="297" width="230" height="22" rx="4"/>
+  <rect x="20" y="497" width="230" height="22" rx="4"/>
+  <rect x="20" y="523" width="230" height="22" rx="4"/>
+  <rect x="20" y="549" width="230" height="22" rx="4"/>
+  <g marker-end="url(#arr)">
+    <line x1="250" y1="104" x2="378" y2="104"/>
+    <line x1="250" y1="130" x2="378" y2="130"/>
+    <line x1="250" y1="156" x2="378" y2="156"/>
+    <line x1="250" y1="182" x2="378" y2="182"/>
+    <line x1="250" y1="230" x2="378" y2="230"/>
+    <line x1="250" y1="256" x2="378" y2="256"/>
+    <line x1="250" y1="282" x2="378" y2="282"/>
+    <line x1="250" y1="308" x2="378" y2="308"/>
+    <line x1="250" y1="508" x2="378" y2="508"/>
+    <line x1="250" y1="534" x2="378" y2="534"/>
+    <line x1="250" y1="560" x2="378" y2="560"/>
+  </g>
+  <!-- Controller box outline -->
+  <rect x="10" y="489" width="250" height="90" rx="6" stroke-dasharray="5 4" stroke="var(--muted)"/>
+  <!-- Pot -->
+  <rect x="780" y="104" width="205" height="252" rx="4"/>
+  <line x1="670" y1="200" x2="780" y2="200" stroke="var(--power)" stroke-width="2"/>
+  <line x1="670" y1="150" x2="780" y2="150"/>
+  <line x1="780" y1="325" x2="672" y2="325" marker-end="url(#arr)"/>
+  <!-- Legend swatches -->
+  <rect x="20" y="622" width="14" height="14" fill="var(--gnd)"/><rect x="20" y="644" width="14" height="14" fill="var(--power)"/><rect x="20" y="666" width="14" height="14" fill="var(--sig)"/>
+  <rect x="20" y="690" width="14" height="14" stroke="var(--muted)" stroke-width="1"/>
+</g>
+<g fill="currentColor">
+  <text x="304" y="42" font-size="11" fill="var(--muted)">WAVESHARE PICO SERVO DRIVER · TOP VIEW</text>
+  <text x="545" y="326" text-anchor="middle" font-weight="600">Raspberry Pi</text>
+  <text x="545" y="342" text-anchor="middle" font-weight="600">Pico</text>
+  <text x="545" y="364" text-anchor="middle" font-size="10" fill="var(--muted)">plugs into the</text>
+  <text x="545" y="377" text-anchor="middle" font-size="10" fill="var(--muted)">board's sockets</text>
+  <text x="545" y="82" text-anchor="middle" font-size="9">USB</text>
+  <text x="486" y="100" font-size="9" fill="var(--muted)">1</text><text x="604" y="100" text-anchor="end" font-size="9" fill="var(--muted)">40</text>
+  <text x="486" y="594" font-size="9" fill="var(--muted)">20</text><text x="604" y="594" text-anchor="end" font-size="9" fill="var(--muted)">21</text>
+  <text x="328" y="65" font-size="10" fill="var(--power)">VIN +</text>
+  <text x="328" y="79" font-size="10">GND</text>
+  <text x="344" y="386" text-anchor="middle" font-size="9" fill="var(--muted)">5 V</text>
+  <text x="344" y="398" text-anchor="middle" font-size="9" fill="var(--muted)">regulator</text>
+  <text x="368" y="672" text-anchor="middle" font-size="9">ON · OFF</text>
+  <text x="368" y="630" text-anchor="middle" font-size="9" fill="var(--muted)">power switch</text>
+  <text x="526" y="674" text-anchor="middle" font-size="9">VIN_CFG · set to VSYS</text>
+  <text x="526" y="628" text-anchor="middle" font-size="9" fill="var(--muted)">jumper</text>
+  <text x="640" y="672" text-anchor="middle" font-size="9">RESET</text>
+  <!-- Channel numbers and G V S labels -->
+  <text x="396" y="108" text-anchor="end" font-size="10">0</text>
+  <text x="396" y="134" text-anchor="end" font-size="10">1</text>
+  <text x="396" y="160" text-anchor="end" font-size="10">2</text>
+  <text x="396" y="186" text-anchor="end" font-size="10">3</text>
+  <text x="396" y="234" text-anchor="end" font-size="10">4</text>
+  <text x="396" y="260" text-anchor="end" font-size="10">5</text>
+  <text x="396" y="286" text-anchor="end" font-size="10">6</text>
+  <text x="396" y="312" text-anchor="end" font-size="10">7</text>
+  <text x="396" y="360" text-anchor="end" font-size="10">8</text>
+  <text x="396" y="386" text-anchor="end" font-size="10">9</text>
+  <text x="396" y="412" text-anchor="end" font-size="10">10</text>
+  <text x="396" y="438" text-anchor="end" font-size="10">11</text>
+  <text x="396" y="486" text-anchor="end" font-size="10">12</text>
+  <text x="396" y="512" text-anchor="end" font-size="10">13</text>
+  <text x="396" y="538" text-anchor="end" font-size="10">14</text>
+  <text x="396" y="564" text-anchor="end" font-size="10">15</text>
+  <text x="407" y="204" text-anchor="middle" font-size="9" fill="var(--muted)">G</text><text x="425" y="204" text-anchor="middle" font-size="9" fill="var(--muted)">V</text><text x="443" y="204" text-anchor="middle" font-size="9" fill="var(--muted)">S</text>
+  <text x="407" y="330" text-anchor="middle" font-size="9" fill="var(--muted)">G</text><text x="425" y="330" text-anchor="middle" font-size="9" fill="var(--muted)">V</text><text x="443" y="330" text-anchor="middle" font-size="9" fill="var(--muted)">S</text>
+  <text x="407" y="456" text-anchor="middle" font-size="9" fill="var(--muted)">G</text><text x="425" y="456" text-anchor="middle" font-size="9" fill="var(--muted)">V</text><text x="443" y="456" text-anchor="middle" font-size="9" fill="var(--muted)">S</text>
+  <text x="407" y="582" text-anchor="middle" font-size="9" fill="var(--muted)">G</text><text x="425" y="582" text-anchor="middle" font-size="9" fill="var(--muted)">V</text><text x="443" y="582" text-anchor="middle" font-size="9" fill="var(--muted)">S</text>
+  <!-- Right-edge header labels -->
+  <text x="650" y="104" text-anchor="end" font-size="10" fill="var(--muted)">VBUS</text>
+  <text x="650" y="129" text-anchor="end" font-size="10" fill="var(--muted)">VSYS</text>
+  <text x="650" y="154" text-anchor="end" font-size="10" font-weight="600">GND</text>
+  <text x="650" y="179" text-anchor="end" font-size="10" fill="var(--muted)">EN</text>
+  <text x="650" y="204" text-anchor="end" font-size="10" font-weight="600">3V3</text>
+  <text x="650" y="229" text-anchor="end" font-size="10" fill="var(--muted)">VREF</text>
+  <text x="650" y="254" text-anchor="end" font-size="10" fill="var(--muted)">GP28</text>
+  <text x="650" y="279" text-anchor="end" font-size="10" fill="var(--muted)">GND</text>
+  <text x="650" y="304" text-anchor="end" font-size="10" fill="var(--muted)">GP27</text>
+  <text x="650" y="329" text-anchor="end" font-size="10" font-weight="600">GP26</text>
+  <text x="650" y="354" text-anchor="end" font-size="10" fill="var(--muted)">RUN</text>
+  <text x="650" y="379" text-anchor="end" font-size="10" fill="var(--muted)">GP22</text>
+  <text x="650" y="404" text-anchor="end" font-size="10" fill="var(--muted)">GND</text>
+  <text x="650" y="429" text-anchor="end" font-size="10" fill="var(--muted)">GP21</text>
+  <text x="650" y="454" text-anchor="end" font-size="10" fill="var(--muted)">GP20</text>
+  <text x="650" y="479" text-anchor="end" font-size="10" fill="var(--muted)">GP19</text>
+  <text x="650" y="504" text-anchor="end" font-size="10" fill="var(--muted)">GP18</text>
+  <text x="650" y="529" text-anchor="end" font-size="10" fill="var(--muted)">GND</text>
+  <text x="650" y="554" text-anchor="end" font-size="10" fill="var(--muted)">GP17</text>
+  <text x="650" y="579" text-anchor="end" font-size="10" fill="var(--muted)">GP16</text>
+  <!-- Devices on the servo channels -->
+  <text x="28" y="108" font-size="11" font-weight="600">Head · left</text><text x="244" y="108" text-anchor="end" font-size="10">MG996R</text>
+  <text x="28" y="134" font-size="11" font-weight="600">Head · right</text><text x="244" y="134" text-anchor="end" font-size="10">MG996R</text>
+  <text x="28" y="160" font-size="11" font-weight="600">Eyebrow · left</text><text x="244" y="160" text-anchor="end" font-size="10">MG90S</text>
+  <text x="28" y="186" font-size="11" font-weight="600">Eyebrow · right</text><text x="244" y="186" text-anchor="end" font-size="10">MG90S</text>
+  <text x="28" y="234" font-size="11" font-weight="600">Wiper · left</text><text x="244" y="234" text-anchor="end" font-size="10">MG90S</text>
+  <text x="28" y="260" font-size="11" font-weight="600">Wiper · right</text><text x="244" y="260" text-anchor="end" font-size="10">MG90S</text>
+  <text x="28" y="286" font-size="11" font-weight="600">Belly door</text><text x="244" y="286" text-anchor="end" font-size="10">MG90S</text>
+  <text x="28" y="312" font-size="11" font-weight="600">Charge meter LEDs</text><text x="244" y="312" text-anchor="end" font-size="10">7 × WS2812B</text>
+  <text x="28" y="512" font-size="11" font-weight="600">Belly toggle</text><text x="244" y="512" text-anchor="end" font-size="10">S + G only</text>
+  <text x="28" y="538" font-size="11" font-weight="600">Wiper toggle</text><text x="244" y="538" text-anchor="end" font-size="10">S + G only</text>
+  <text x="28" y="564" font-size="11" font-weight="600">Eyebrow button</text><text x="244" y="564" text-anchor="end" font-size="10">S + G only</text>
+  <text x="14" y="483" font-size="11" fill="var(--muted)">CONTROLLER BOX</text>
+  <text x="250" y="380" text-anchor="end" font-size="10" fill="var(--muted)">channels 8–12: spare</text>
+  <text x="250" y="394" text-anchor="end" font-size="10" fill="var(--muted)">1000 µF capacitor across</text>
+  <text x="250" y="408" text-anchor="end" font-size="10" fill="var(--muted)">V and G on one of them</text>
+  <!-- Battery, laptop -->
+  <text x="30" y="60" font-weight="600">7.2 V NiMH pack</text>
+  <text x="30" y="77" font-size="10" fill="var(--muted)">6 cells · T-plug pigtail</text>
+  <text x="271" y="56" text-anchor="middle" font-size="9" fill="var(--power)">red</text>
+  <text x="271" y="88" text-anchor="middle" font-size="9">black</text>
+  <text x="882" y="61" text-anchor="middle" font-weight="600">Laptop</text>
+  <text x="882" y="76" text-anchor="middle" font-size="10">USB · code only</text>
+  <!-- Pot -->
+  <text x="790" y="122" font-weight="600">Head knob · 10 kΩ pot</text>
+  <text x="790" y="135" font-size="10" fill="var(--muted)">in the controller box</text>
+  <text x="790" y="204" font-size="10">red wire · outer pin</text>
+  <text x="790" y="154" font-size="10">yellow wire · outer pin</text>
+  <text x="790" y="329" font-size="10" font-weight="600">black wire · middle pin</text>
+  <text x="790" y="342" font-size="9" fill="var(--muted)">the signal</text>
+  <text x="725" y="195" text-anchor="middle" font-size="9" fill="var(--power)">3.3 V</text>
+  <text x="725" y="145" text-anchor="middle" font-size="9">ground</text>
+  <text x="725" y="320" text-anchor="middle" font-size="9">signal</text>
+  <!-- Legend -->
+  <text x="42" y="633" font-size="10">G · ground (black pins)</text>
+  <text x="42" y="655" font-size="10">V · 5 V power (red pins)</text>
+  <text x="42" y="677" font-size="10">S · signal (yellow pins)</text>
+  <text x="42" y="701" font-size="10" fill="var(--muted)">outline = nothing plugged in</text>
+</g>
+</svg>
+</div>
+<figcaption>Channel numbers are the same as GP numbers: channel 0 is GP0, channel 15 is GP15. A servo or LED strip plug covers all three pins of its channel. A switch uses only S and G; its V pin stays empty. Filled pins have a wire on them. Drawn from Waveshare's pinout for board revision 3.1, not to scale; check it against the labels printed on your board.</figcaption>
+</figure>
+
+<div class="cols">
+<section>
+  <h2>Pin map</h2>
+  <table>
+    <thead><tr><th>Pin</th><th>Connected to</th><th>Where on the board</th></tr></thead>
+    <tbody>
+      <tr><td class="pin">GP0</td><td>Head left — MG996R</td><td>Channel 0, all three pins</td></tr>
+      <tr><td class="pin">GP1</td><td>Head right — MG996R</td><td>Channel 1, all three pins</td></tr>
+      <tr><td class="pin">GP2</td><td>Eyebrow left — MG90S</td><td>Channel 2, all three pins</td></tr>
+      <tr><td class="pin">GP3</td><td>Eyebrow right — MG90S</td><td>Channel 3, all three pins</td></tr>
+      <tr><td class="pin">GP4</td><td>Wiper left — MG90S</td><td>Channel 4, all three pins</td></tr>
+      <tr><td class="pin">GP5</td><td>Wiper right — MG90S</td><td>Channel 5, all three pins</td></tr>
+      <tr><td class="pin">GP6</td><td>Belly door — MG90S</td><td>Channel 6, all three pins</td></tr>
+      <tr><td class="pin">GP7</td><td>LED strip, 7 pixels</td><td>Channel 7: data on S, 5 V on V, ground on G</td></tr>
+      <tr><td class="pin">GP13</td><td>Belly toggle</td><td>Channel 13, S and G</td></tr>
+      <tr><td class="pin">GP14</td><td>Wiper toggle</td><td>Channel 14, S and G</td></tr>
+      <tr><td class="pin">GP15</td><td>Eyebrow button</td><td>Channel 15, S and G</td></tr>
+      <tr><td class="pin">GP26</td><td>Pot middle pin — the <strong>black</strong> wire</td><td>Right-edge header, 10th pin from the top</td></tr>
+      <tr><td class="pin">3V3</td><td>Pot red wire</td><td>Right-edge header, 5th pin from the top</td></tr>
+      <tr><td class="pin">GND</td><td>Pot yellow wire</td><td>Right-edge header, 3rd pin from the top (the GND above 3V3)</td></tr>
+      <tr><td class="pin"><span class="pw">VIN</span></td><td>Battery T-plug pigtail: red to +, black to −</td><td>Screw terminal, top left</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Wiring rules and bench notes</h2>
+  <ol>
+    <li><strong>Header mapping works as labeled.</strong> Servos on GP0–GP6, the strip on GP7 and the controls on GP13–GP15 all respond on the pins the code names. If a header is ever moved, change <code>src/common/pins.py</code>, not the wiring.</li>
+    <li><strong>Controls use S and G only.</strong> The button and both toggles go between S and G on their header. Never use V: it is 5 V, and a switch across V and G shorts the servo rail.</li>
+    <li><strong>The pot's black wire is the signal.</strong> Black (middle pin) to GP26, red to 3V3, yellow to GND. Wired by color the other way, the reading sits near zero for most of the turn. Take 3V3 and GND from the Pico's own pins, never from a servo header.</li>
+    <li><strong>LED strip.</strong> Go by the pad labels on the strip, not the wire colors: 5V to V, GND to G, DIN to S on the GP7 header. Use the end the arrows point away from.</li>
+    <li><strong>Set the power jumper to the battery/VSYS position.</strong> Waveshare's note: don't select USB and battery at the same time. USB can stay plugged in for programming; it just shouldn't be the servo supply.</li>
+    <li><strong>Capacitor polarity.</strong> The stripe on the can is the negative leg. Stripe to GND, long leg to 5 V. Backwards, it pops.</li>
+    <li><strong>Battery polarity.</strong> Meter the T-plug pigtail against the pack before plugging in. Red to VIN +.</li>
+    <li><strong>Servo ranges are bench values.</strong> The limits in <code>src/common/settings.py</code> were set with nothing on the horns. Narrow them to what each mechanism allows before mounting. A servo driven into a stop strips itself.</li>
+    <li><strong>Reset when the head moves?</strong> That's the 5 V rail sagging. The cap is the first fix; the code already starts the two head servos one after the other.</li>
+  </ol>
+</section>
+</div>
+</main>
+</body>
+</html>
