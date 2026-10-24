@@ -67,11 +67,12 @@ BELLY_DOOR_SECONDS = 1.5  # time to open or close. Bigger = slower
 BELLY_DOOR_EASE_IN = 0  # part of the time spent speeding up. 0.2 = 20%
 BELLY_DOOR_EASE_OUT = 0.75  # part of the time spent slowing down
 
-# NeoPixel strip: pixels 0-7 are the bars (0 at the bottom),
-# pixel 8 is the sun, straight after the last bar.
-BAR_COUNT = 8
-SUN_PIXEL = BAR_COUNT
-PIXEL_COUNT = BAR_COUNT + 1
+# NeoPixel strip: 6 bars on 7 pixels, starting at the bottom. The bottom
+# bar is bigger and uses pixels 0 and 1 together. Each bar after that is
+# one pixel: 2, 3, 4, 5, 6.
+BAR_COUNT = 6
+BOTTOM_BAR_PIXELS = 2
+PIXEL_COUNT = BAR_COUNT + BOTTOM_BAR_PIXELS - 1
 PIXEL_BRIGHTNESS = 0.25  # keep between 0.2 and 0.3
 OFF = (0, 0, 0)
 RED = (255, 0, 0)
@@ -79,11 +80,12 @@ YELLOW = (255, 180, 0)
 ORANGE = (255, 60, 0)
 
 # Charge meter. It works like a battery that runs down:
-# when the belly door closes, the bars fill up one at a time and the sun
-# lights. Then a bar drops every few seconds. The last few bars are orange.
+# when the belly door closes, the bars fill up one at a time. Then a bar
+# drops every few seconds. The last few bars are orange.
 # When only one bar is left it blinks red, and stays that way until the door
 # opens and closes again.
 METER_BAR_SECONDS = 0.3  # filling up: time between one bar lighting and the next
-METER_DROP_SECONDS = 3.0  # running down: time between one bar dropping and the next
+METER_DROP_SECONDS = 5.0  # running down: time between one bar dropping and the next
 METER_LOW_BARS = 3  # with this many bars or fewer, the bars are orange
 METER_FLASH_SECONDS = 0.75  # the red light is on this long, then off this long
+METER_FADE_SECONDS = 0.25  # every light fades on or off over this long. Keep it under METER_FLASH_SECONDS

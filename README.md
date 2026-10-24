@@ -21,7 +21,7 @@ This file is the project baseline: what we decided, why, how it's wired, and how
 | Eye wipers (left + right) | Toggle switch | On = sweep back and forth. Off = park. |
 | Belly trash door | Toggle switch | On = open. Off = closed. |
 | Head halves ("binocular" effect) | 10 kΩ potentiometer | Knob position sets the angle. The right half mirrors the left half. Movement is eased so it glides. |
-| Charge meter + sun icon (chest) | Automatic, follows the belly door | Works like a battery running down. When the belly door closes, the bars fill up from wherever they are to all 8, and the sun lights. At power-on they fill from empty. Then one bar drops every few seconds. The last few bars are orange, the rest yellow. When one bar is left it blinks red, until the door opens and closes again. The timings and the orange level are in `settings.py`. |
+| Charge meter (chest) | Automatic, follows the belly door | Works like a battery running down. When the belly door closes, the bars fill up from wherever they are to all 6. At power-on they fill from empty. The bottom bar is two LEDs that work as one. Then one bar drops every few seconds. The last few bars are orange, the rest yellow. When only the bottom bar is left it blinks red, until the door opens and closes again. The timings and the orange level are in `settings.py`. |
 
 **Not in this version:** sound/speaker, any LCD or OLED screen, wifi or phone control, battery voltage readout. See [Deferred ideas](#9-deferred-ideas).
 
@@ -40,7 +40,7 @@ This file is the project baseline: what we decided, why, how it's wired, and how
 | Momentary push button (7 mm, prewired, normally open) | 1 | Eyebrows |
 | SPST toggle switch (screw terminals) | 2 | Wipers, belly door |
 | 10 kΩ linear potentiometer (WH148 B10K) | 1 | Head position |
-| WS2812B / NeoPixel LED strip, cut to length | 9 LEDs | Charge meter (8 bars) + sun icon (1 LED) |
+| WS2812B / NeoPixel LED strip, cut to length | 7 LEDs | Charge meter: 6 bars, the bottom bar is 2 LEDs |
 | 1000 µF electrolytic capacitor (16 V or higher) | 1 | Across the 5 V servo rail to prevent brownout resets |
 | 7.2 V 6-cell NiMH RC pack, T-plug (Deans) | 1 | Costume power |
 | Female T-plug pigtail | 1 | Battery to board VIN terminal |
@@ -108,7 +108,7 @@ Full parts list with links and prices: `docs/wall-e-parts-list.xlsx`.
 - **The pot gets 3.3 V, never 5 V.** The Pico's ADC pins are not 5 V tolerant.
 - **Pot wire colors are not what they look like.** On our pots the **black** wire is the middle pin (the signal) and goes to GP26. **Yellow** is an outer pin and goes to GND. **Red** is the other outer pin and goes to 3V3. If the knob works backwards, swap red and yellow. To check any pot with a meter: the two wires whose resistance stays at about 10 kΩ as the knob turns are the outer pins; the third wire is the middle one. `experiments/pot.py` prints the voltage on the analog pins.
 - **NeoPixel pin order is not servo pin order.** Servo header: signal / 5 V / GND. Strip pads: 5 V / DIN / GND. Wire each lead individually. Data goes into the DIN end.
-- **NeoPixel chain order:** pixels 0–7 are the bars (0 at the bottom), pixel 8 is the sun. The sun pixel is cut off and rejoined with three wires (DOUT → DIN) so it can sit separately.
+- **NeoPixel chain order:** 7 pixels make 6 bars, starting at the bottom. Pixels 0 and 1 are the bottom bar and always light together; pixels 2–6 are one bar each.
 
 ### ⚠️ Not yet verified against the real board
 
@@ -300,7 +300,7 @@ Each step is a small win and ends with something moving or lighting up.
 6. **Head.** Pot → angle, mirrored, then add easing.
 7. **Wipers.** First with `time.sleep` to see the problem (everything else freezes), then fix it.
 8. **asyncio.** One task per feature in `code.py`.
-9. **Charge meter.** Bars fill, sun lights. It follows the belly door.
+9. **Charge meter.** Bars fill, then run down. It follows the belly door.
 10. **Power.** Move from wall adapter to battery. Add the capacitor. Test all features at once.
 11. **Costume integration.** Mount servos, pushrods, controller box, cable runs.
 
